@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "02A0ECB974E15DEDCDD56ACCFB1EC75C8A4FB507",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "02A0ECB974E15DEDCDD56ACCFB1EC75C8A4FB507" : 0,
+    "AF926AD93FBC4CA3B3862537931122351AFC10FB" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "D13E5393-F331-4DDB-BAB5-67858680ECF0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "02A0ECB974E15DEDCDD56ACCFB1EC75C8A4FB507" : "Chapter2.playground\/",
+    "AF926AD93FBC4CA3B3862537931122351AFC10FB" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : ".",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : ".",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/FlexMonkey\/Chapter2.playground.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "02A0ECB974E15DEDCDD56ACCFB1EC75C8A4FB507"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/FlexMonkey\/CoreImageForSwiftPlaygrounds.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "AF926AD93FBC4CA3B3862537931122351AFC10FB"
+    }
+  ]
+}
