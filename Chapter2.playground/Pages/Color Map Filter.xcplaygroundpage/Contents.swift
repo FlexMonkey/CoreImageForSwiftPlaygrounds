@@ -12,7 +12,7 @@ import CoreImage
 let monaLisa = CIImage(image: UIImage(named: "monalisa.jpg")!)!
 let blueYellowWhite = CIImage(image: UIImage(named: "blueYellowWhite.png")!)!
 
-let final = monaLisa.imageByApplyingFilter("CIColorMap",
+let final = monaLisa.applyingFilter("CIColorMap",
     withInputParameters: [kCIInputGradientImageKey: blueYellowWhite])
 
 //: ### Creating a Color Map
@@ -45,36 +45,36 @@ func colorMapGradientFromColors(colors:[RGB]) -> CIImage
 {
     let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     let bitmapInfo:CGBitmapInfo = CGBitmapInfo(
-        rawValue: CGImageAlphaInfo.NoneSkipFirst.rawValue)
+        rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue)
     
     let bitsPerComponent = 8
     let bitsPerPixel = 32
     
     var sortedColors = colors
-        .sort({ $0.luma < $1.luma })
-        .flatMap({ [RGB](count: 16, repeatedValue: $0) })
+        .sorted(by: { $0.luma < $1.luma })
+        .flatMap({ [RGB](repeating: $0, count: 16) })
     
     let width = sortedColors.count
     
-    let dataProvider = CGDataProviderCreateWithCFData(
-        NSData(bytes: &sortedColors,
-            length: sortedColors.count * sizeof(RGB)))
+    let dataProvider = CGDataProvider(
+        data: NSData(bytes: &sortedColors,
+            length: sortedColors.count * MemoryLayout<RGB>.size))
     
-    let cgImage = CGImageCreate(
-        width,
-        1,
-        bitsPerComponent,
-        bitsPerPixel,
-        width * sizeof(RGB),
-        rgbColorSpace,
-        bitmapInfo,
-        dataProvider,
-        nil,
-        true,
-        .RenderingIntentDefault
+    let cgImage = CGImage(
+        width: width,
+        height: 1,
+        bitsPerComponent: bitsPerComponent,
+        bitsPerPixel: bitsPerPixel,
+        bytesPerRow: width * MemoryLayout<RGB>.size,
+        space: rgbColorSpace,
+        bitmapInfo: bitmapInfo,
+        provider: dataProvider!,
+        decode: nil,
+        shouldInterpolate: true,
+        intent: .defaultIntent
     )
     
-    return CIImage(CGImage: cgImage!)
+    return CIImage(cgImage: cgImage!)
 }
 
 let blueYellowWhiteColors = [
@@ -82,24 +82,24 @@ let blueYellowWhiteColors = [
     RGB(r: 255, g: 255, b: 0),
     RGB(r: 255, g: 255, b: 255)]
 
-let blueYellowWhiteColorMap = colorMapGradientFromColors(blueYellowWhiteColors)
+let blueYellowWhiteColorMap = colorMapGradientFromColors(colors: blueYellowWhiteColors)
 
 let blueYellowWhiteWindow = window
-    .imageByApplyingFilter("CIColorMap",
+    .applyingFilter("CIColorMap",
         withInputParameters: [
             kCIInputGradientImageKey: blueYellowWhiteColorMap])
 
 //: ### Alternative Mapping Palettes
 
-func eightBitFromColorPalette(sourceImage sourceImage: CIImage,
+func eightBitFromColorPalette(sourceImage: CIImage,
     colors: [RGB]) -> CIImage
 {
-    let colorMapGradient = colorMapGradientFromColors(colors)
+    let colorMapGradient = colorMapGradientFromColors(colors: colors)
     
     return sourceImage
-        .imageByApplyingFilter("CIPixellate",
+        .applyingFilter("CIPixellate",
             withInputParameters: nil)
-        .imageByApplyingFilter("CIColorMap",withInputParameters: [
+        .applyingFilter("CIColorMap",withInputParameters: [
             kCIInputGradientImageKey: colorMapGradient])
 }
 

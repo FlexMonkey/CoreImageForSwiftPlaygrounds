@@ -18,12 +18,12 @@ class GeneralFilter: CIFilter
     
     override var outputImage : CIImage!
     {
-        if let inputImage = inputImage, kernel = kernel
+        if let inputImage = inputImage, let kernel = kernel
         {
             let extent = inputImage.extent
             let arguments = [inputImage]
             
-            return kernel.applyWithExtent(extent,
+            return kernel.apply(withExtent: extent,
                 roiCallback:
                 {
                     (index, rect) in
@@ -55,7 +55,7 @@ class ColorFilter: CIFilter
     override var outputImage: CIImage!
     {
         guard let inputImage = inputImage,
-            colorKernel = colorKernel else
+            let colorKernel = colorKernel else
         {
             return nil
         }
@@ -63,7 +63,7 @@ class ColorFilter: CIFilter
         let extent = inputImage.extent
         let arguments = [inputImage]
         
-        return colorKernel.applyWithExtent(extent,
+        return colorKernel.apply(withExtent: extent,
             arguments: arguments)
     }
 }
@@ -85,11 +85,11 @@ class WarpFilter: CIFilter
     
     override var outputImage : CIImage!
     {
-        if let inputImage = inputImage, kernel = warpKernel
+        if let inputImage = inputImage, let kernel = warpKernel
         {
             let extent = inputImage.extent
             
-            return kernel.applyWithExtent(extent,
+            return kernel.apply(withExtent: extent,
                 roiCallback:
                 {
                     (index, rect) in
