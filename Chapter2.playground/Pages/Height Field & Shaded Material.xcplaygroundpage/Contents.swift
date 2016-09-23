@@ -44,23 +44,23 @@ let shadedImage = shadedMaterial.outputImage!
 let label = UILabel(frame:
     CGRect(x: 0, y: 0, width: 640, height: 160))
 label.text = "Core Image\nfor Swift"
-label.font = UIFont.boldSystemFontOfSize(200)
+label.font = UIFont.boldSystemFont(ofSize: 200)
 label.adjustsFontSizeToFitWidth = true
 label.numberOfLines = 2
-label.textAlignment = .Center
+label.textAlignment = .center
 
 UIGraphicsBeginImageContextWithOptions(
     CGSize(width: label.frame.width,
         height: label.frame.height), false, 1)
 
-label.layer.renderInContext(UIGraphicsGetCurrentContext()!)
+label.layer.render(in: UIGraphicsGetCurrentContext()!)
 
 let textImage = UIGraphicsGetImageFromCurrentImageContext()
 
 UIGraphicsEndImageContext()
 
 let labelColorInvert = CIFilter(name: "CIColorInvert",
-    withInputParameters: [kCIInputImageKey: CIImage(image: textImage)!])!
+    withInputParameters: [kCIInputImageKey: CIImage(image: textImage!)!])!
 
 let labelMaskToAlpha = CIFilter(name: "CIMaskToAlpha",
     withInputParameters: [

@@ -9,25 +9,25 @@ import CoreImage
 
 kCICategoryHalftoneEffect
 
-CIFilter.localizedNameForCategory(kCICategoryHalftoneEffect)
+CIFilter.localizedName(forCategory: kCICategoryHalftoneEffect)
 
 //: ### Querying for Filters
 
-CIFilter.filterNamesInCategory(kCICategoryHalftoneEffect)
+CIFilter.filterNames(inCategory: kCICategoryHalftoneEffect)
 
-CIFilter.filterNamesInCategories(nil)
+CIFilter.filterNames(inCategories: nil)
 
-CIFilter.filterNamesInCategories([kCICategoryVideo,
+CIFilter.filterNames(inCategories: [kCICategoryVideo,
     kCICategoryStillImage])
 
-CIFilter.filterNamesInCategories([kCICategoryBlur,
+CIFilter.filterNames(inCategories: [kCICategoryBlur,
     kCICategorySharpen])
 
 //: ### Using the Filter Name
 
-CIFilter.localizedNameForFilterName("CICMYKHalftone")
+CIFilter.localizedName(forFilterName: "CICMYKHalftone")
 
-CIFilter.localizedDescriptionForFilterName("CICMYKHalftone")
+CIFilter.localizedDescription(forFilterName: "CICMYKHalftone")
 
 CIFilter(name: "xyz")
 
@@ -45,9 +45,9 @@ filter.attributes.filter({ inputKeys.contains($0.0) })
 if let
     attribute = filter
         .attributes["inputGCR"] as? [String: AnyObject],
-    minimum = attribute[kCIAttributeSliderMin] as? Float,
-    maximum = attribute[kCIAttributeSliderMax] as? Float,
-    defaultValue = attribute[kCIAttributeDefault] as? Float where
+    let minimum = attribute[kCIAttributeSliderMin] as? Float,
+    let maximum = attribute[kCIAttributeSliderMax] as? Float,
+    let defaultValue = attribute[kCIAttributeDefault] as? Float ,
     (attribute[kCIAttributeClass] as? String) == "NSNumber"
 {
     let slider = UISlider()
@@ -57,10 +57,10 @@ if let
     slider.value = defaultValue
 }
 
-Set<String>(CIFilter.filterNamesInCategory(nil).flatMap {
+Set<String>(CIFilter.filterNames(inCategory: nil).flatMap {
     CIFilter(name: $0)!
         .attributes[kCIAttributeFilterCategories] as! [String]
-    }).sort()
+    }).sorted()
 
 
 //: [Next](@next)
