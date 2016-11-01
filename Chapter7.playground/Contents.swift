@@ -6,16 +6,16 @@ import XCPlayground
 
 let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 640, height: 640))
 
-imageView.contentMode = .Center
+imageView.contentMode = .center
 
 let ciContext = CIContext()
 
 func imageFromCIImage(source: CIImage) -> UIImage
 {
     let cgImage = ciContext.createCGImage(source,
-        fromRect: source.extent)
+                                          from: source.extent)
     
-    return UIImage(CGImage: cgImage)
+    return UIImage(cgImage: cgImage!)
 }
 
 XCPlaygroundPage.currentPage.liveView = imageView
@@ -39,7 +39,7 @@ class RedGreenFilter: CIFilter
 override var outputImage: CIImage!
 {
     guard let inputImage = inputImage,
-        kernel = kernel else
+        let kernel = kernel else
     {
         return nil
     }
@@ -48,7 +48,7 @@ override var outputImage: CIImage!
     
     let arguments = [inputImage]
     
-    return kernel.applyWithExtent(extent,
+    return kernel.apply(withExtent: extent,
         arguments: arguments)
 }
 }
@@ -72,7 +72,7 @@ class BlueGreenFilter: CIFilter
     override var outputImage: CIImage!
     {
         guard let inputImage = inputImage,
-            kernel = kernel else
+            let kernel = kernel else
         {
             return nil
         }
@@ -81,7 +81,7 @@ class BlueGreenFilter: CIFilter
         
         let arguments = [inputImage]
         
-        return kernel.applyWithExtent(extent,
+        return kernel.apply(withExtent: extent,
             arguments: arguments)
     }
 }
@@ -106,21 +106,21 @@ let redGreenOutput = redGreenFilter.outputImage
 
 //imageView.image = imageFromCIImage(redGreenOutput)
 
-let additionImageOne = blueGreenOutput
-    .imageByApplyingFilter("CIAdditionCompositing",
+let additionImageOne = blueGreenOutput?
+    .applyingFilter("CIAdditionCompositing",
         withInputParameters: [
             kCIInputBackgroundImageKey: redGreenOutput])
 
 // imageView.image = imageFromCIImage(additionImageOne)
 
-let blueGreenRender = CIImage(image: imageFromCIImage(blueGreenOutput))!
-    .imageByApplyingTransform(CGAffineTransformMakeTranslation(0, 220))
+let blueGreenRender = CIImage(image: imageFromCIImage(source: blueGreenOutput!))!
+    .applying(CGAffineTransform(translationX: 0, y: 220))
 
-let redGreenRender = CIImage(image: imageFromCIImage(redGreenOutput))!
-    .imageByApplyingTransform(CGAffineTransformMakeTranslation(220, 0))
+let redGreenRender = CIImage(image: imageFromCIImage(source: redGreenOutput!))!
+    .applying(CGAffineTransform(translationX: 220, y: 0))
 
 let additionImageTwo = blueGreenRender
-    .imageByApplyingFilter("CIAdditionCompositing",
+    .applyingFilter("CIAdditionCompositing",
         withInputParameters: [
             kCIInputBackgroundImageKey: redGreenRender])
 
@@ -133,7 +133,7 @@ class AddComposite: CIFilter
     var inputImage: CIImage?
     var inputBackgroundImage: CIImage?
 
-    var extentFunction: (CGRect, CGRect) -> CGRect = { (a: CGRect, b: CGRect) in return CGRectZero }
+    var extentFunction: (CGRect, CGRect) -> CGRect = { (a: CGRect, b: CGRect) in return }
     
     var kernel = CIColorKernel(string:
         "kernel vec4 thresholdFilter(__sample image, __sample backgroundImage)" +
@@ -145,8 +145,8 @@ class AddComposite: CIFilter
     override var outputImage: CIImage!
     {
         guard let inputImage = inputImage,
-            inputBackgroundImage = inputBackgroundImage,
-            addKernel = kernel else
+            let inputBackgroundImage = inputBackgroundImage,
+            let addKernel = kernel else
         {
             return nil
         }
@@ -156,7 +156,7 @@ class AddComposite: CIFilter
         
         let arguments = [inputImage, inputBackgroundImage]
         
-        return addKernel.applyWithExtent(extent,
+        return addKernel.apply(withExtent: extent,
             arguments: arguments)
     }
 }
@@ -165,17 +165,17 @@ let red = CIColor(red: 1, green: 0, blue: 0)
 let blue = CIColor(red: 0, green: 0, blue: 1)
 
 let redPortrait = CIImage(color: red)
-    .imageByCroppingToRect(CGRect(
+    .cropping(to: CGRect(
         origin: CGPoint(x: 220, y: 20),
         size: CGSize(width: 200, height: 600)))
 
 let blueLandscape = CIImage(color: blue)
-    .imageByCroppingToRect(CGRect(
+    .cropping(to: CGRect(
         origin: CGPoint(x: 20, y: 220),
         size: CGSize(width: 600, height: 200)))
 
 let regularComposite = redPortrait
-    .imageByApplyingFilter("CIAdditionCompositing",
+    .applyingFilter("CIAdditionCompositing",
         withInputParameters: [kCIInputBackgroundImageKey: blueLandscape])
 
 
@@ -201,9 +201,9 @@ let union = addFilter.outputImage
 // imageView.image = imageFromCIImage(union)
 
 //: ### `intersect` demonstration
-addFilter.extentFunction = { (fore, back) in fore.intersect(back) }
+addFilter.extentFunction = { (fore, back) in fore.intersection(back) }
 let intersect = addFilter.outputImage
-imageView.image = imageFromCIImage(intersect)
+imageView.image = imageFromCIImage(source: intersect!)
 
 
 
