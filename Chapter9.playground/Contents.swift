@@ -87,7 +87,7 @@ class MaskedVariableBlur: CIFilter
 class FilterVendor: NSObject, CIFilterConstructor
 {
     
-    @objc func filter(withName: String) -> CIFilter?
+    func filter(withName: String) -> CIFilter?
     {
         switch withName
         {
