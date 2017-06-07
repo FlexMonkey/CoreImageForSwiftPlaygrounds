@@ -2,7 +2,7 @@
 
 import UIKit
 import CoreImage
-import XCPlayground
+import PlaygroundSupport
 
 let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 640, height: 640))
 
@@ -10,20 +10,18 @@ imageView.contentMode = .center
 
 let ciContext = CIContext()
 
-func imageFromCIImage(source: CIImage) -> UIImage
-{
-    let cgImage = ciContext.createCGImage(source,
-                                          from: source.extent)
-    
+func imageFromCIImage(source: CIImage) -> UIImage {
+    let cgImage = ciContext.createCGImage(source, from: source.extent)
     return UIImage(cgImage: cgImage!)
 }
 
-XCPlaygroundPage.currentPage.liveView = imageView
+PlaygroundPage.current.liveView = imageView
+
 
 //: ### RedGreenFilter
 
-class RedGreenFilter: CIFilter
-{
+class RedGreenFilter: CIFilter {
+    
     var inputImage: CIImage?
     var inputBackgroundImage: CIImage?
     
@@ -36,44 +34,9 @@ class RedGreenFilter: CIFilter
         "}"
     )
     
-override var outputImage: CIImage!
-{
-    guard let inputImage = inputImage,
-        let kernel = kernel else
-    {
-        return nil
-    }
-    
-    let extent = self.extent ?? inputImage.extent
-    
-    let arguments = [inputImage]
-    
-    return kernel.apply(withExtent: extent,
-        arguments: arguments)
-}
-}
-
-//: ### BlueGreenFilter
-
-class BlueGreenFilter: CIFilter
-{
-    var inputImage: CIImage?
-    var inputBackgroundImage: CIImage?
-    
-    var extent: CGRect?
-    
-    var kernel = CIColorKernel(string:
-        "kernel vec4 thresholdFilter(__sample image)" +
-        "{" +
-        "   return vec4(0.0, image.g * 0.5, image.b, image.a);" +
-        "}"
-    )
-    
-    override var outputImage: CIImage!
-    {
-        guard let inputImage = inputImage,
-            let kernel = kernel else
-        {
+    override var outputImage: CIImage! {
+        
+        guard let inputImage = inputImage, let kernel = kernel else {
             return nil
         }
         
@@ -86,7 +49,40 @@ class BlueGreenFilter: CIFilter
     }
 }
 
-// ---
+//: ### BlueGreenFilter
+
+class BlueGreenFilter: CIFilter {
+    
+    var inputImage: CIImage?
+    var inputBackgroundImage: CIImage?
+    
+    var extent: CGRect?
+    
+    var kernel = CIColorKernel(string:
+        "kernel vec4 thresholdFilter(__sample image)" +
+        "{" +
+        "   return vec4(0.0, image.g * 0.5, image.b, image.a);" +
+        "}"
+    )
+    
+    override var outputImage: CIImage! {
+        
+        guard let inputImage = inputImage, let kernel = kernel else {
+            return nil
+        }
+        
+        let extent = self.extent ?? inputImage.extent
+        
+        let arguments = [inputImage]
+        
+        return kernel.apply(withExtent: extent,
+            arguments: arguments)
+    }
+}
+
+
+//: ----
+
 
 let sunflower = CIImage(image: UIImage(named: "sunflower.jpg")!)!
 
@@ -96,7 +92,9 @@ blueGreenFilter.inputImage = sunflower
 blueGreenFilter.extent = sunflower.extent.insetBy(dx: 0, dy: 200)
 let blueGreenOutput = blueGreenFilter.outputImage
 
-//imageView.image = imageFromCIImage(blueGreenOutput)
+if let blueGreen = blueGreenOutput {
+    imageView.image = imageFromCIImage(source: blueGreen)
+}
 
 //: ### Portrait sunflower demonstration
 let redGreenFilter = RedGreenFilter()
@@ -104,14 +102,19 @@ redGreenFilter.inputImage = sunflower
 redGreenFilter.extent = sunflower.extent.insetBy(dx: 200, dy: 0)
 let redGreenOutput = redGreenFilter.outputImage
 
-//imageView.image = imageFromCIImage(redGreenOutput)
+if let redGreen = redGreenOutput {
+    imageView.image = imageFromCIImage(source: redGreen)
+}
 
 let additionImageOne = blueGreenOutput?
     .applyingFilter("CIAdditionCompositing",
         withInputParameters: [
-            kCIInputBackgroundImageKey: redGreenOutput])
+            kCIInputBackgroundImageKey: redGreenOutput!])
 
-// imageView.image = imageFromCIImage(additionImageOne)
+if let additionImage1 = additionImageOne {
+    imageView.image = imageFromCIImage(source: additionImage1)
+}
+
 
 let blueGreenRender = CIImage(image: imageFromCIImage(source: blueGreenOutput!))!
     .applying(CGAffineTransform(translationX: 0, y: 220))
@@ -124,16 +127,19 @@ let additionImageTwo = blueGreenRender
         withInputParameters: [
             kCIInputBackgroundImageKey: redGreenRender])
 
-// imageView.image = imageFromCIImage(additionImageTwo)
+imageView.image = imageFromCIImage(source: additionImageTwo)
+
 
 //: ## Composite Image Color Kernels (Colored boxes)
 
-class AddComposite: CIFilter
-{
+class AddComposite: CIFilter {
+    
     var inputImage: CIImage?
     var inputBackgroundImage: CIImage?
 
-    var extentFunction: (CGRect, CGRect) -> CGRect = { (a: CGRect, b: CGRect) in return }
+    var extentFunction: (CGRect, CGRect) -> CGRect = { (a: CGRect, b: CGRect) in
+        return CGRect.zero
+    }
     
     var kernel = CIColorKernel(string:
         "kernel vec4 thresholdFilter(__sample image, __sample backgroundImage)" +
@@ -142,8 +148,8 @@ class AddComposite: CIFilter
         "}"
     )
     
-    override var outputImage: CIImage!
-    {
+    override var outputImage: CIImage! {
+        
         guard let inputImage = inputImage,
             let inputBackgroundImage = inputBackgroundImage,
             let addKernel = kernel else
@@ -188,25 +194,33 @@ addFilter.inputBackgroundImage = blueLandscape
 //: ### `portrait` demonstration
 addFilter.extentFunction = { (fore, back) in return fore }
 let portrait = addFilter.outputImage
-// imageView.image = imageFromCIImage(portrait)
+if let portrait = portrait {
+    imageView.image = imageFromCIImage(source: portrait)
+}
+
 
 //: ### `landscape` demonstration
 addFilter.extentFunction = { (fore, back) in return back }
 let landscape = addFilter.outputImage
-// imageView.image = imageFromCIImage(landscape)
+if let landscape = landscape {
+    imageView.image = imageFromCIImage(source: landscape)
+}
+
 
 //: ### `union` demonstration
 addFilter.extentFunction = { (fore, back) in return fore.union(back) }
 let union = addFilter.outputImage
-// imageView.image = imageFromCIImage(union)
+if let union = union {
+    imageView.image = imageFromCIImage(source: union)
+}
+
 
 //: ### `intersect` demonstration
 addFilter.extentFunction = { (fore, back) in fore.intersection(back) }
 let intersect = addFilter.outputImage
-imageView.image = imageFromCIImage(source: intersect!)
-
-
-
+if let intersect = intersect {
+    imageView.image = imageFromCIImage(source: intersect)
+}
 
 
 // ends...
