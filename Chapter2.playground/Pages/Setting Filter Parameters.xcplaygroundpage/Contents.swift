@@ -5,13 +5,13 @@
 import UIKit
 import CoreImage
 
-let cropRect = CGRect(origin: CGPointZero,
+let cropRect = CGRect(origin: CGPoint.zero,
     size: CGSize(width: 200, height: 200))
 
 //: ### `CIColor` - Core Image Color
 
 let inputColor0 = CIColor(red: 1, green: 1, blue: 0)
-let inputColor1 = CIColor(color: UIColor.purpleColor())
+let inputColor1 = CIColor(color: UIColor.purple)
 
 let gradientFilter = CIFilter(name: "CILinearGradient",
     withInputParameters: ["inputColor0": inputColor0,
@@ -19,12 +19,12 @@ let gradientFilter = CIFilter(name: "CILinearGradient",
 
 
 let gradientImage = gradientFilter.outputImage?
-    .imageByCroppingToRect(cropRect)
+    .cropping(to: cropRect)
 
 //: ### `CIImage` - Core Image Image
 
 let redImage = CIImage(color: CIColor(red: 1, green: 0, blue: 0))
-    .imageByCroppingToRect(cropRect)
+    .cropping(to: cropRect)
 
 let sunflowerImage = CIImage(image: UIImage(named: "sunflower.jpg")!)!
 
@@ -47,9 +47,9 @@ let monochromeImage = monochrome?.outputImage
 
 //: ### `CIVector` - Core Image Vector
 
-CIVector(CGPoint: CGPoint(x: 10, y: 10))
+CIVector(cgPoint: CGPoint(x: 10, y: 10))
 
-CIVector(CGRect: CGRect(x: 10,
+CIVector(cgRect: CGRect(x: 10,
     y: 10,
     width: 100,
     height: 100))
@@ -61,8 +61,8 @@ let weightsAttribute = convolutionFilter.attributes[kCIInputWeightsKey]
 let defaultValue = weightsAttribute[kCIAttributeDefault]
     as! CIVector
 
-let newValues = [CGFloat](count: defaultValue.count,
-    repeatedValue: 0.0)
+let newValues = [CGFloat](repeating: 0.0,
+                          count: defaultValue.count)
 let newVector = CIVector(values: newValues,
     count: newValues.count)
 
@@ -72,7 +72,7 @@ convolutionFilter.setValue(newVector,
 //: ### `NSNumber` - Numeric Types
 
 let width: Int = 25
-let angle: Double = M_PI
+let angle: Double = .pi
 let sharpness: UInt = 16
 let gcr: Float = 2.6
 let ucr: CGFloat = 5.4
@@ -90,7 +90,7 @@ let cmykHalftoneFilter = CIFilter(name: "CICMYKHalftone",
 
 let message = "Core Image for Swift"
 
-let data = message.dataUsingEncoding(NSASCIIStringEncoding)!
+let data = message.data(using: String.Encoding.ascii)!
 
 let barcodeGeneratorFilter = CIFilter(name: "CICode128BarcodeGenerator",
     withInputParameters: ["inputMessage": data])!
@@ -106,7 +106,7 @@ let cubeArray: [Double] = [
     1.0, 0.4, 0.0, 1.0]
 
 let cubeData = NSData(bytes: cubeArray,
-    length: sizeof(Double) * cubeArray.count)
+    length: MemoryLayout<Double>.size * cubeArray.count)
 
 let colorCubeFilter = CIFilter(name: "CIColorCube",
     withInputParameters: [kCIInputImageKey: sunflowerImage,
@@ -116,7 +116,7 @@ let colorCubeImage = colorCubeFilter.outputImage
 
 //: ### `NSObject` - Data Objects
 
-let colorSpace = CGColorSpaceCreateDeviceRGB()!
+let colorSpace = CGColorSpaceCreateDeviceRGB()
 
 let colorCubeWithColorSpace = CIFilter(name: "CIColorCubeWithColorSpace",
     withInputParameters: [kCIInputImageKey: sunflowerImage,

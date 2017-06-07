@@ -27,12 +27,12 @@ class CRTWarpFilter: CIFilter
     override var outputImage : CIImage!
         {
             if let inputImage = inputImage,
-                crtWarpKernel = crtWarpKernel
+                let crtWarpKernel = crtWarpKernel
             {
-                let arguments = [CIVector(x: inputImage.extent.size.width, y: inputImage.extent.size.height), bend]
+                let arguments = [CIVector(x: inputImage.extent.size.width, y: inputImage.extent.size.height), bend] as [Any]
                 let extent = inputImage.extent
                 
-                return crtWarpKernel.applyWithExtent(extent,
+                return crtWarpKernel.apply(withExtent: extent,
                     roiCallback:
                     {
                         (index, rect) in
@@ -51,9 +51,9 @@ let ciContext = CIContext()
 func imageFromCIImage(source: CIImage) -> UIImage
 {
     let cgImage = ciContext.createCGImage(source,
-        fromRect: source.extent)
+                                          from: source.extent)
     
-    return UIImage(CGImage: cgImage)
+    return UIImage(cgImage: cgImage!)
 }
 
 //: ### Swift Implementation of barrel warp kernel
@@ -84,17 +84,17 @@ let backgroundImage = CIFilter(name: "CICheckerboardGenerator",
         "inputColor1": CIColor(red: 0.15, green: 0.15, blue: 0.15),
         "inputCenter": CIVector(x: 0, y: 0),
         "inputWidth": 50])!
-    .outputImage!.imageByCroppingToRect(CGRect(x: 1, y: 1, width: width - 2, height: height - 2))
-    .imageByCompositingOverImage(CIImage(color: CIColor(red: 0, green: 0, blue: 0)))
-    .imageByCroppingToRect(CGRect(origin: CGPointZero, size: CGSize(width: width, height: height)))
+    .outputImage!.cropping(to: CGRect(x: 1, y: 1, width: width - 2, height: height - 2))
+    .compositingOverImage(CIImage(color: CIColor(red: 0, green: 0, blue: 0)))
+    .cropping(to: CGRect(origin: .zero, size: CGSize(width: width, height: height)))
 
 let blueBox = CIImage(color: CIColor(red: 0.5, green: 0.5, blue: 1, alpha: 0.7))
-    .imageByCroppingToRect(
-        CGRect(origin: CGPoint(x: coordX - 5, y: coordY - 5), size: CGSize(width: 10, height: 10)))
+    .cropping(
+        to: CGRect(origin: CGPoint(x: coordX - 5, y: coordY - 5), size: CGSize(width: 10, height: 10)))
 
 let redBox = CIImage(color: CIColor(red: 1, green: 0, blue: 0, alpha: 0.7))
-    .imageByCroppingToRect(
-        CGRect(origin: CGPoint(x: x - 5, y: y - 5), size: CGSize(width: 10, height: 10)))
+    .cropping(
+        to: CGRect(origin: CGPoint(x: x - 5, y: y - 5), size: CGSize(width: 10, height: 10)))
 
 let warpFilter = CRTWarpFilter()
 
@@ -105,7 +105,7 @@ let composite = CIFilter(name: "CIAdditionCompositing",
             kCIInputBackgroundImageKey: warpFilter.outputImage,
             kCIInputImageKey: blueBox])!
     .outputImage!
-    .imageByApplyingFilter("CIAdditionCompositing",
+    .applyingFilter("CIAdditionCompositing",
         withInputParameters: [kCIInputBackgroundImageKey: redBox])
 
 let result = composite

@@ -9,10 +9,10 @@ class MaskedVariableBlur: CIFilter
     var inputBlurImage: CIImage?
     var inputBlurRadius: CGFloat = 5
     
-    override var attributes: [String : AnyObject]
+    override var attributes: [String : Any]
     {
         return [
-            kCIAttributeFilterDisplayName: "Metal Pixellate",
+            kCIAttributeFilterDisplayName: "Metal Pixellate" as AnyObject,
             
             "inputImage": [kCIAttributeIdentity: 0,
                 kCIAttributeClass: "CIImage",
@@ -64,15 +64,15 @@ class MaskedVariableBlur: CIFilter
     {
         guard let
             inputImage = inputImage,
-            inputBlurImage = inputBlurImage else
+            let inputBlurImage = inputBlurImage else
         {
             return nil
         }
         
         let extent = inputImage.extent
 
-        let blur = maskedVariableBlur?.applyWithExtent(
-            inputImage.extent,
+        let blur = maskedVariableBlur?.apply(
+            withExtent: inputImage.extent,
             roiCallback:
             {
                 (index, rect) in
@@ -80,15 +80,16 @@ class MaskedVariableBlur: CIFilter
             },
             arguments: [inputImage, inputBlurImage, inputBlurRadius])
         
-        return blur!.imageByCroppingToRect(extent)
+        return blur!.cropping(to: extent)
     }
 }
 //: ### Filter vendor
 class FilterVendor: NSObject, CIFilterConstructor
 {
-    func filterWithName(name: String) -> CIFilter?
+    
+    func filter(withName: String) -> CIFilter?
     {
-        switch name
+        switch withName
         {
         case "MaskedVariableBlur":
             return MaskedVariableBlur()
@@ -99,7 +100,8 @@ class FilterVendor: NSObject, CIFilterConstructor
     }
 }
 //: ### Register filter
-CIFilter.registerFilterName("MaskedVariableBlur",
+
+CIFilter.registerName("MaskedVariableBlur",
                             constructor: FilterVendor(),
                             classAttributes: [kCIAttributeFilterName: "MaskedVariableBlur"])
 //: ### Source Image
@@ -115,7 +117,7 @@ let gradientImage = CIFilter(
         "inputColor1": CIColor(red: 1, green: 1, blue: 1)
     ])?
     .outputImage?
-    .imageByCroppingToRect(monaLisa.extent)
+    .cropping(to: monaLisa.extent)
 //: ### Final output
-let final = monaLisa.imageByApplyingFilter("MaskedVariableBlur", withInputParameters: ["inputBlurRadius": 10, "inputBlurImage": gradientImage!])
+let final = monaLisa.applyingFilter("MaskedVariableBlur", withInputParameters: ["inputBlurRadius": 10, "inputBlurImage": gradientImage!])
 
