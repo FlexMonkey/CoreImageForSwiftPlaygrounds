@@ -32,11 +32,11 @@ let finalImageOne = bloomFilteOne.outputImage!
 //: Final image using `valueForKey()`
 
 let finalImageTwo = bloomFilteOne
-    .valueForKey(kCIOutputImageKey) as! CIImage
+    .value(forKey: kCIOutputImageKey) as! CIImage
 
 //: Final image using `imageByApplyingFilter()`
 
-let finalImageThree = carMascot.imageByApplyingFilter("CIBloom",
+let finalImageThree = carMascot.applyingFilter("CIBloom",
     withInputParameters: [
         kCIInputRadiusKey: 8,
         kCIInputIntensityKey: 1.25
@@ -62,21 +62,21 @@ let finalNoirImageOne = noirFilter.outputImage!
 //: Final image using `imageByApplyingFilter()`
 
 let finalNoirImageTwo = carMascot
-    .imageByApplyingFilter("CIBloom",
+    .applyingFilter("CIBloom",
         withInputParameters: [
             kCIInputRadiusKey: 8,
             kCIInputIntensityKey: 1.25])
-    .imageByApplyingFilter("CIPhotoEffectNoir",
+    .applyingFilter("CIPhotoEffectNoir",
         withInputParameters: nil)
 
 //: ### Composite & Blend Filters
 
 let stripesImage = CIFilter(name: "CIStripesGenerator")!
     .outputImage!
-    .imageByCroppingToRect(carMascot.extent)
+    .cropping(to: carMascot.extent)
 
 let negativeImage = carMascot
-    .imageByApplyingFilter("CIColorInvert",
+    .applyingFilter("CIColorInvert",
         withInputParameters: nil)
 
 //: Final composite using `setValue`
@@ -95,7 +95,7 @@ let compositeImageOne = compositeFilter.outputImage!
 //: Final composite using `imageByApplyingFilter()`
 
 let compositeImageTwo = carMascot
-    .imageByApplyingFilter("CIBlendWithMask",
+    .applyingFilter("CIBlendWithMask",
         withInputParameters: [
             kCIInputBackgroundImageKey: negativeImage,
             kCIInputMaskImageKey: stripesImage])
